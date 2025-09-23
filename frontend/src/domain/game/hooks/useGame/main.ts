@@ -1,7 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { useEffect } from 'react';
 import { gameService } from '../../services';
 import { useGameStore } from '../../stores';
+import { configService } from '@/domain/config/services';
 
 /**
  * @hook useGame
@@ -11,29 +13,50 @@ import { useGameStore } from '../../stores';
  */
 export const useGame = () => {
   const {
+    sessionId,
     status,
     attempts,
     history,
     feedbackMessage,
+    minRange,
+    maxRange,
+    setConfig,
     startGame: startStoreGame,
     setGuessResult,
     setFeedbackMessage,
     resetGame,
   } = useGameStore();
 
+  const { data: config } = useQuery({
+    queryKey: ['gameConfig'],
+    queryFn: configService.getGameConfig,
+    staleTime: Infinity, // Config doesn't change often
+  });
+
+  useEffect(() => {
+    if (config) {
+      setConfig(config);
+    }
+  }, [config, setConfig]);
+
   const startMutation = useMutation({
     mutationFn: gameService.startGame,
-    onSuccess: () => {
-      startStoreGame();
+    onSuccess: (data) => {
+      startStoreGame(data);
     },
     onError: (error) => {
-      toast.error(`Error starting game: ${error.message}`);
+      toast.error(`Erro ao iniciar o jogo: ${error.message}`);
       resetGame();
     },
   });
 
   const guessMutation = useMutation({
-    mutationFn: (guess: number) => gameService.makeGuess(guess),
+    mutationFn: (guess: number) => {
+      if (!sessionId) {
+        throw new Error('Session ID is missing.');
+      }
+      return gameService.makeGuess({ sessionId, guess });
+    },
     onSuccess: (data) => {
       setGuessResult(data);
     },
@@ -49,6 +72,8 @@ export const useGame = () => {
     attempts,
     history,
     feedbackMessage,
+    minRange,
+    maxRange,
 
     // Mutations
     startGame: startMutation.mutate,

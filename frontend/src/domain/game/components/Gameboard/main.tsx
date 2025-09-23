@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
-import { Button, LoadingSpinner } from '@/core/components';
+import { Button } from '@/core/components';
 import { useGame } from '../../hooks';
 import { AttemptsHistory } from '../AttemptsHistory';
 import { FeedbackDisplay } from '../FeedbackDisplay';
 import { GuessForm } from '../GuessForm';
-import { useGameStore } from '../../stores';
-import { useGameConfig } from '@/domain/config';
 
 /**
  * @component Gameboard
@@ -13,23 +10,20 @@ import { useGameConfig } from '@/domain/config';
  * @domain game
  */
 export const Gameboard = () => {
-  const { status, history, feedbackMessage, startGame, makeGuess, isGuessing, isStarting } = useGame();
-  const { minRange, maxRange, setConfig } = useGameStore();
-
-  const { data: gameConfig, isLoading: isConfigLoading } = useGameConfig();
-
-  useEffect(() => {
-    if (gameConfig) {
-      setConfig(gameConfig);
-    }
-  }, [gameConfig, setConfig]);
+  const {
+    status,
+    history,
+    feedbackMessage,
+    minRange,
+    maxRange,
+    startGame,
+    makeGuess,
+    isGuessing,
+    isStarting,
+  } = useGame();
 
   const isGameFinished = status === 'finished';
   const isGameIdle = status === 'idle';
-
-  if (isConfigLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-8 p-4">
@@ -39,7 +33,11 @@ export const Gameboard = () => {
 
       {(isGameIdle || isGameFinished) && (
         <Button onClick={() => startGame()} disabled={isStarting} size="lg">
-          {isStarting ? 'Iniciando...' : isGameFinished ? 'Jogar Novamente' : 'Começar a Jogar'}
+          {isStarting
+            ? 'Iniciando...'
+            : isGameFinished
+            ? 'Jogar Novamente'
+            : 'Começar a Jogar'}
         </Button>
       )}
 

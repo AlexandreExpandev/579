@@ -15,16 +15,23 @@ interface GuessFormProps {
  * @summary Form for the user to input and submit their guess.
  * @domain game
  */
-export const GuessForm = ({ onSubmit, isSubmitting, isDisabled, minRange, maxRange }: GuessFormProps) => {
+export const GuessForm = ({
+  onSubmit,
+  isSubmitting,
+  isDisabled,
+  minRange,
+  maxRange,
+}: GuessFormProps) => {
   const [guess, setGuess] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const guessSchema = useMemo(() => z.coerce
-    .number()
-    .int('Entrada inválida. Por favor, insira um número inteiro.')
-    .min(minRange, `O número deve estar entre ${minRange} e ${maxRange}.`)
-    .max(maxRange, `O número deve estar entre ${minRange} e ${maxRange}.`)
-  , [minRange, maxRange]);
+  const guessSchema = useMemo(() => {
+    return z.coerce
+      .number()
+      .int('Entrada inválida. Por favor, insira um número inteiro.')
+      .min(minRange, `O número deve estar entre ${minRange} e ${maxRange}.`)
+      .max(maxRange, `O número deve estar entre ${minRange} e ${maxRange}.`);
+  }, [minRange, maxRange]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -41,7 +48,10 @@ export const GuessForm = ({ onSubmit, isSubmitting, isDisabled, minRange, maxRan
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full max-w-md"
+    >
       <div className="w-full">
         <input
           type="number"

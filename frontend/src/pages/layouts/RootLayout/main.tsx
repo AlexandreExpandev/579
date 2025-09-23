@@ -1,10 +1,19 @@
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 const Header = () => (
   <header className="bg-white shadow-md">
     <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-      <div className="text-2xl font-bold text-blue-600">GuessNumber</div>
-      {/* Navigation links can go here */}
+      <Link to="/" className="text-2xl font-bold text-blue-600">
+        GuessNumber
+      </Link>
+      <div>
+        <Link
+          to="/admin/config"
+          className="text-gray-600 hover:text-blue-600 transition-colors"
+        >
+          Admin
+        </Link>
+      </div>
     </nav>
   </header>
 );

@@ -18,6 +18,15 @@ export type GameStatus = 'idle' | 'active' | 'finished';
 export type GuessFeedback = 'higher' | 'lower' | 'correct';
 
 /**
+ * @interface StartGameResult
+ * @summary The structure of the data returned from the backend after starting a game.
+ */
+export interface StartGameResult {
+  sessionId: string;
+  message: string;
+}
+
+/**
  * @interface GuessResult
  * @summary The structure of the data returned from the backend after a guess.
  */
@@ -34,10 +43,13 @@ export interface GuessResult {
  * @summary The structure of the game state managed by the Zustand store.
  */
 export interface GameState {
+  sessionId: string | null;
   status: GameStatus;
   attempts: number;
   history: number[];
   feedbackMessage: string;
+  minRange: number;
+  maxRange: number;
 }
 
 /**
@@ -45,7 +57,8 @@ export interface GameState {
  * @summary The complete structure of the Zustand store, including state and actions.
  */
 export interface GameStore extends GameState {
-  startGame: () => void;
+  setConfig: (config: { minRange: number; maxRange: number }) => void;
+  startGame: (result: StartGameResult) => void;
   setGuessResult: (result: GuessResult) => void;
   setFeedbackMessage: (message: string) => void;
   resetGame: () => void;

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { GameStore } from '../types';
+import { GameStore, GameState } from '../types';
 
-const initialState = {
+const initialState: GameState = {
+  sessionId: null,
   status: 'idle' as const,
   attempts: 0,
   history: [],
@@ -17,11 +18,15 @@ const initialState = {
  * @type domain-store
  * @stateManager zustand
  */
-export const useGameStore = create<GameStore>((set) => ({
+export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
-  startGame: () =>
+  setConfig: (config) =>
+    set({ minRange: config.minRange, maxRange: config.maxRange }),
+
+  startGame: (result) =>
     set((state) => ({
+      sessionId: result.sessionId,
       status: 'active',
       attempts: 0,
       history: [],
@@ -32,7 +37,7 @@ export const useGameStore = create<GameStore>((set) => ({
     set((state) => {
       let feedbackMessage = '';
       if (result.feedback === 'correct') {
-        feedbackMessage = `Você acertou em ${result.attempts} tentativas!`;
+        feedbackMessage = `Você acertou em ${result.attempts} tentativas! O número era ${result.secretNumber}.`;
       } else if (result.feedback === 'higher') {
         feedbackMessage = 'É maior!';
       } else {
@@ -49,7 +54,5 @@ export const useGameStore = create<GameStore>((set) => ({
 
   setFeedbackMessage: (message) => set({ feedbackMessage: message }),
 
-  setConfig: (config) => set({ minRange: config.minRange, maxRange: config.maxRange }),
-
-  resetGame: () => set((state) => ({ ...initialState, minRange: state.minRange, maxRange: state.maxRange })),
+  resetGame: () => set({ ...initialState, minRange: get().minRange, maxRange: get().maxRange }),
 }));
