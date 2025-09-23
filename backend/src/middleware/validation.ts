@@ -1,20 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import { AnyZodObject, ZodError } from 'zod';
-import { AppError } from '@/utils/AppError';
-import { HttpStatusCode } from '@/constants';
+import { AnyZodObject } from 'zod';
 
 /**
  * @summary
- * Middleware factory to validate incoming request data against a Zod schema.
- * It checks req.body, req.query, and req.params.
- *
- * @param schema The Zod schema to validate against.
- * @returns An Express middleware function.
+ * Creates a validation middleware using a Zod schema.
+ * 
+ * @param {AnyZodObject} schema - The Zod schema to validate against.
+ * 
+ * @returns {Function} An Express middleware function.
  */
-export const validateRequest = (
-  schema: AnyZodObject,
-) => {
-  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+export const validationMiddleware = (schema: AnyZodObject) => 
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await schema.parseAsync({
         body: req.body,
@@ -23,10 +19,6 @@ export const validateRequest = (
       });
       next();
     } catch (error) {
-      if (error instanceof ZodError) {
-        return next(new AppError('Validation failed', HttpStatusCode.BAD_REQUEST, 'VALIDATION_ERROR', error.flatten().fieldErrors));
-      }
-      next(new AppError('An unexpected error occurred during validation', HttpStatusCode.INTERNAL_SERVER_ERROR));
+      next(error); // Pass the ZodError to the global error handler
     }
   };
-};

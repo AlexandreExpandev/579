@@ -1,9 +1,11 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+
 import { config } from '@/config';
 import { logger } from '@/utils/logger';
-import { securityMiddleware } from '@/middleware/security';
-import { requestLoggerMiddleware } from '@/middleware/requestLogger';
-import { rateLimiter } from '@/middleware/rateLimiter';
 import { errorHandler } from '@/middleware/errorHandler';
 import { notFoundHandler } from '@/middleware/notFoundHandler';
 import mainRouter from '@/routes';
@@ -11,16 +13,16 @@ import mainRouter from '@/routes';
 const app: Application = express();
 
 // Core Middleware
-app.use(securityMiddleware);
+app.use(helmet());
+app.use(cors(config.api.cors));
+app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(requestLoggerMiddleware);
-app.use(rateLimiter);
 
-// Health Check Endpoint
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
-});
+// Logging
+if (config.env !== 'test') {
+  app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
+}
 
 // API Routes
 app.use('/api', mainRouter);
@@ -29,8 +31,8 @@ app.use('/api', mainRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-const server = app.listen(config.port, () => {
-  logger.info(`Server is running on port ${config.port} in ${config.nodeEnv} mode`);
+const server = app.listen(config.api.port, () => {
+  logger.info(`Server running on port ${config.api.port} in ${config.env} mode`);
 });
 
 // Graceful Shutdown
@@ -38,7 +40,7 @@ const signals = ['SIGTERM', 'SIGINT'];
 
 const gracefulShutdown = (signal: string) => {
   process.on(signal, () => {
-    logger.info(`${signal} received, closing server gracefully...`);
+    logger.info(`${signal} received, closing server gracefully.`);
     server.close(() => {
       logger.info('Server closed.');
       // Close database connection here if needed

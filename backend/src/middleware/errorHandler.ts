@@ -1,37 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '@/utils/logger';
-import { AppError } from '@/utils/AppError';
 import { ZodError } from 'zod';
+import { logger } from '@/utils/logger';
+import { errorResponse } from '@/utils/responseHandler';
 
-export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction): void => {
-  logger.error(`[${req.method}] ${req.path} >> StatusCode:: ${err instanceof AppError ? err.statusCode : 500}, Message:: ${err.message}`);
+interface AppError extends Error {
+  statusCode?: number;
+  isOperational?: boolean;
+}
 
-  if (err instanceof AppError) {
-    res.status(err.statusCode).json({
-      success: false,
-      error: {
-        message: err.message,
-        code: err.errorCode,
-      },
-    });
-    return;
-  }
+/**
+ * @summary
+ * Global error handling middleware.
+ * 
+ * @param {AppError} err - The error object.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {NextFunction} _next - Express next function.
+ * 
+ * @returns {void}
+ */
+export const errorHandler = (err: AppError, req: Request, res: Response, _next: NextFunction): void => {
+  logger.error(err.message, { stack: err.stack, path: req.path });
 
   if (err instanceof ZodError) {
-    res.status(400).json({
-      success: false,
-      error: {
-        message: 'Validation failed',
-        details: err.flatten().fieldErrors,
-      },
-    });
+    res.status(400).json(errorResponse('Validation Error', 'VALIDATION_ERROR', err.errors));
     return;
   }
 
-  res.status(500).json({
-    success: false,
-    error: {
-      message: 'An unexpected internal server error occurred.',
-    },
-  });
+  const statusCode = err.statusCode || 500;
+  const message = err.isOperational ? err.message : 'An unexpected error occurred.';
+  const code = err.name.toUpperCase().replace(/ /g, '_');
+
+  res.status(statusCode).json(errorResponse(message, code));
 };

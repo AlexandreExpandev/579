@@ -3,12 +3,15 @@ import type { Config } from '@jest/types';
 const config: Config.InitialOptions = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  verbose: true,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testMatch: ['**/?(*.)+(spec|test).ts'],
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  testMatch: ['**/?(*.)+(spec|test).ts?(x)'],
+  verbose: true,
+  forceExit: true,
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
 };
 
 export default config;

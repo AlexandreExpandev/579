@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import externalRoutes from './external.routes';
-import internalRoutes from './internal.routes';
+import externalRoutes from '@/routes/external.routes';
+import internalRoutes from '@/routes/internal.routes';
 
 const router = Router();
 
-router.use('/v1/external', externalRoutes);
-router.use('/v1/internal', internalRoutes);
+router.use('/external', externalRoutes);
+router.use('/internal', internalRoutes);
 
 export default router;

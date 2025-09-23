@@ -1,10 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
+import { errorResponse } from '@/utils/responseHandler';
 
-export const notFoundHandler = (_req: Request, res: Response, _next: NextFunction): void => {
-  res.status(404).json({
-    success: false,
-    error: {
-      message: 'API endpoint not found',
-    },
-  });
+/**
+ * @summary
+ * Handles requests to routes that do not exist.
+ * 
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * 
+ * @returns {void}
+ */
+export const notFoundHandler = (req: Request, res: Response): void => {
+  const message = `Route not found: ${req.method} ${req.originalUrl}`;
+  res.status(404).json(errorResponse(message, 'NOT_FOUND'));
 };
