@@ -10,26 +10,26 @@
  */
 
 // Domain public exports will be added here as they are created
-// export * from './components/Gameboard';
-// export * from './hooks/useGame';
-// export * from './services/gameService';
-// export * from './stores/gameStore';
-// export * from './types';
+export * from './components';
+export * from './hooks';
+export * from './services';
+export * from './stores';
+export * from './types';
 
 // Module metadata
 export const gameModuleMetadata = {
   name: 'game',
   domain: 'functional',
   version: '1.0.0',
-  publicComponents: [],
-  publicHooks: [],
-  publicServices: [],
-  publicStores: [],
+  publicComponents: ['Gameboard', 'GuessForm', 'FeedbackDisplay', 'AttemptsHistory'],
+  publicHooks: ['useGame'],
+  publicServices: ['gameService'],
+  publicStores: ['useGameStore'],
   dependencies: {
     internal: ['core/components/Button', 'core/lib/api'],
-    external: ['zustand', 'zod', '@tanstack/react-query'],
+    external: ['zustand', 'zod', '@tanstack/react-query', 'react-hot-toast'],
   },
-  routes: ['/game'],
+  routes: ['/'],
   description:
     'Core module for the GuessNumber game logic and user interface.',
 } as const;

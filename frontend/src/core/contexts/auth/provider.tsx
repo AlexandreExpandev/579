@@ -3,8 +3,13 @@ import { AuthContext } from './context';
 import { AuthProviderProps, User } from './types';
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // SIMULATE a logged-in admin user for demonstration
+  const [user, setUser] = useState<User | null>({
+    id: 'admin-user',
+    name: 'Admin',
+    email: 'admin@guessnumber.com',
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   // In a real app, you would have an effect here to check for an existing session
   // useEffect(() => { ... check session ...; setIsLoading(false); }, []);

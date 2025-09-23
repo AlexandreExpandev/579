@@ -1,3 +1,3 @@
 // This file will export all business logic services.
-// Example:
-// export * from './game/gameService';
+export * from './game';
+export * from './config';

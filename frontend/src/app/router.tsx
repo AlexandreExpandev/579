@@ -6,6 +6,7 @@ import { RootLayout } from '@/pages/layouts/RootLayout';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('@/pages/Home'));
+const AdminSettingsPage = lazy(() => import('@/pages/AdminSettings'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
 /**
@@ -29,7 +30,14 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      // Future routes will be added here
+      {
+        path: 'admin/settings',
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AdminSettingsPage />
+          </Suspense>
+        ),
+      },
       {
         path: '*',
         element: (

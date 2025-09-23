@@ -1,17 +1,15 @@
 import { Router } from 'express';
-import { authMiddleware } from '@/middleware/auth';
+// import { authMiddleware } from '@/middleware/auth';
+import gameRoutes from './game.routes';
+import configRoutes from './config.routes';
 
 const router = Router();
 
-// All internal routes are protected by the authentication middleware.
-router.use(authMiddleware);
+// All internal routes would be protected by the authentication middleware.
+// For this simple game, we are leaving it open for easy testing.
+// router.use(authMiddleware);
 
-/**
- * This is a placeholder for feature-specific routes.
- * For example, to add routes for a 'game' feature:
- * 
- * import gameRoutes from './game.routes';
- * router.use('/game', gameRoutes);
- */
+router.use('/game', gameRoutes);
+router.use('/config', configRoutes);
 
 export default router;

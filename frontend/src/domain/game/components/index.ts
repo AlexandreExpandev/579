@@ -1,1 +1,4 @@
-// This file will export all domain-specific components for 'game'.
+export * from './AttemptsHistory';
+export * from './FeedbackDisplay';
+export * from './GuessForm';
+export * from './Gameboard';
